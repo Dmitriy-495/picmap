@@ -1,0 +1,35 @@
+# Зависимости
+node_modules/
+vendor/
+
+# Сборка
+dist/
+build/
+.output/
+.nuxt/
+
+# Бинарники
+picmap-backend
+*.exe
+
+# Окружение
+.env
+.env.local
+.env.*.local
+
+# Логи
+*.log
+logs/
+
+# Загрузки
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
