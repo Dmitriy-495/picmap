@@ -33,3 +33,10 @@ backend/uploads/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Секреты
+authorized_keys.txt
+picmap-nginx.conf
+postgres-info.txt
+*.key
+*.pem
