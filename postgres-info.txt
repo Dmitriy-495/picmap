@@ -1,0 +1,3 @@
+DB: picmap
+User: superuser
+Password: Picmap@25922.tda
