@@ -35,10 +35,10 @@ echo ""
 echo -e "${YELLOW}⏸  Stopping service on VPS...${NC}"
 ssh pm "sudo systemctl stop picmap-backend" || true
 
-# 4. Копируем бинарник на VPS
+# 4. Копируем бинарник на VPS (с gzip)
 echo ""
-echo -e "${YELLOW}📤 Copying binary to VPS...${NC}"
-scp backend/picmap-backend pm:/var/www/picmap/backend/picmap-backend
+echo -e "${YELLOW}📤 Copying binary to VPS (compressed)...${NC}"
+gzip -c backend/picmap-backend | ssh pm "gunzip > /var/www/picmap/backend/picmap-backend.new && chmod +x /var/www/picmap/backend/picmap-backend.new && mv /var/www/picmap/backend/picmap-backend.new /var/www/picmap/backend/picmap-backend"
 
 # 5. Запускаем сервис
 echo ""
