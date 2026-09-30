@@ -14,17 +14,14 @@ import (
 )
 
 func main() {
-	// Загружаем .env
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️  .env not found, using environment variables")
+		log.Println("⚠️  .env not found, using env vars")
 	}
 
-	// Режим Gin
 	if os.Getenv("ENV") == "production" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	// Подключаемся к БД
 	ctx := context.Background()
 	pool, err := db.Connect(ctx)
 	if err != nil {
@@ -33,7 +30,6 @@ func main() {
 	defer pool.Close()
 	log.Println("✅ Connected to PostgreSQL")
 
-	// Роутер
 	r := gin.Default()
 
 	// Health
@@ -41,27 +37,31 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "picmap-backend",
-			"version": "0.2.0",
+			"version": "0.3.0",
 		})
 	})
 
-	// Auth handlers
+	// Handlers
 	authHandler := handlers.NewAuthHandler(pool)
+	routesHandler := handlers.NewRoutesHandler(pool)
 
 	api := r.Group("/api")
 	{
 		// Публичные
 		api.POST("/auth/login", authHandler.Login)
+		api.GET("/routes", routesHandler.List)   // список публичный
 
-		// Защищённые
+		// Защищённые (JWT)
 		protected := api.Group("")
 		protected.Use(handlers.JWTMiddleware())
 		{
 			protected.GET("/auth/me", authHandler.Me)
+			protected.GET("/routes/:id", routesHandler.Get)
+			protected.POST("/routes", routesHandler.Create)
+			protected.DELETE("/routes/:id", routesHandler.Delete)
 		}
 	}
 
-	// Порт
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
