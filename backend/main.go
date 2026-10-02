@@ -37,7 +37,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "picmap-backend",
-			"version": "0.4.0",
+			"version": "0.5.0",
 		})
 	})
 
@@ -45,6 +45,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler(pool)
 	routesHandler := handlers.NewRoutesHandler(pool)
 	placesHandler := handlers.NewPlacesHandler(pool)
+	commentsHandler := handlers.NewCommentsHandler(pool)
 
 	api := r.Group("/api")
 	{
@@ -52,6 +53,7 @@ func main() {
 		api.POST("/auth/login", authHandler.Login)
 		api.GET("/routes", routesHandler.List)
 		api.GET("/routes/:id/places", placesHandler.List)
+		api.GET("/routes/:id/comments", commentsHandler.List)
 
 		// Защищённые (JWT)
 		protected := api.Group("")
@@ -63,6 +65,9 @@ func main() {
 			protected.DELETE("/routes/:id", routesHandler.Delete)
 			protected.POST("/routes/:id/places", placesHandler.Create)
 			protected.DELETE("/places/:id", placesHandler.Delete)
+			protected.POST("/routes/:id/comments", commentsHandler.Create)
+			protected.PUT("/comments/:id", commentsHandler.Update)
+			protected.DELETE("/comments/:id", commentsHandler.Delete)
 		}
 	}
 
