@@ -37,19 +37,21 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "picmap-backend",
-			"version": "0.3.0",
+			"version": "0.4.0",
 		})
 	})
 
 	// Handlers
 	authHandler := handlers.NewAuthHandler(pool)
 	routesHandler := handlers.NewRoutesHandler(pool)
+	placesHandler := handlers.NewPlacesHandler(pool)
 
 	api := r.Group("/api")
 	{
 		// Публичные
 		api.POST("/auth/login", authHandler.Login)
-		api.GET("/routes", routesHandler.List)   // список публичный
+		api.GET("/routes", routesHandler.List)
+		api.GET("/routes/:id/places", placesHandler.List)
 
 		// Защищённые (JWT)
 		protected := api.Group("")
@@ -59,6 +61,8 @@ func main() {
 			protected.GET("/routes/:id", routesHandler.Get)
 			protected.POST("/routes", routesHandler.Create)
 			protected.DELETE("/routes/:id", routesHandler.Delete)
+			protected.POST("/routes/:id/places", placesHandler.Create)
+			protected.DELETE("/places/:id", placesHandler.Delete)
 		}
 	}
 
