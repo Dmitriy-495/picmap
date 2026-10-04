@@ -32,12 +32,19 @@ func main() {
 
 	r := gin.Default()
 
+	// Static для загрузок
+	uploadDir := os.Getenv("UPLOAD_DIR")
+	if uploadDir == "" {
+		uploadDir = "./uploads"
+	}
+	r.Static("/uploads", uploadDir)
+
 	// Health
 	r.GET("/api/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "picmap-backend",
-			"version": "0.5.0",
+			"version": "0.6.0",
 		})
 	})
 
@@ -46,6 +53,7 @@ func main() {
 	routesHandler := handlers.NewRoutesHandler(pool)
 	placesHandler := handlers.NewPlacesHandler(pool)
 	commentsHandler := handlers.NewCommentsHandler(pool)
+	photosHandler := handlers.NewPhotosHandler(pool)
 
 	api := r.Group("/api")
 	{
@@ -54,6 +62,8 @@ func main() {
 		api.GET("/routes", routesHandler.List)
 		api.GET("/routes/:id/places", placesHandler.List)
 		api.GET("/routes/:id/comments", commentsHandler.List)
+		api.GET("/routes/:id/photos", photosHandler.ListByRoute)
+		api.GET("/places/:id/photos", photosHandler.ListByPlace)
 
 		// Защищённые (JWT)
 		protected := api.Group("")
@@ -68,6 +78,8 @@ func main() {
 			protected.POST("/routes/:id/comments", commentsHandler.Create)
 			protected.PUT("/comments/:id", commentsHandler.Update)
 			protected.DELETE("/comments/:id", commentsHandler.Delete)
+			protected.POST("/photos/upload", photosHandler.Upload)
+			protected.DELETE("/photos/:id", photosHandler.Delete)
 		}
 	}
 

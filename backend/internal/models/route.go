@@ -4,16 +4,16 @@ import "time"
 
 // Route — маршрут путешествия
 type Route struct {
-	ID           int64      `json:"id"`
-	OwnerID      int64      `json:"owner_id"`
-	Title        string     `json:"title"`
-	Description  string     `json:"description"`
-	StartDate    time.Time  `json:"start_date"`
-	EndDate      time.Time  `json:"end_date"`
-	CoverPhotoID *int64     `json:"cover_photo_id,omitempty"`
-	CreatedAt    time.Time  `json:"created_at"`
-	Status       string     `json:"status,omitempty"`   // вычисляемое: будет/сейчас/было
-	Places       []Place    `json:"places,omitempty"`
+	ID           int64     `json:"id"`
+	OwnerID      int64     `json:"owner_id"`
+	Title        string    `json:"title"`
+	Description  string    `json:"description"`
+	StartDate    time.Time `json:"start_date"`
+	EndDate      time.Time `json:"end_date"`
+	CoverPhotoID *int64    `json:"cover_photo_id,omitempty"`
+	CreatedAt    time.Time `json:"created_at"`
+	Status       string    `json:"status,omitempty"` // вычисляемое: будет/сейчас/было
+	Places       []Place   `json:"places,omitempty"`
 }
 
 // CreateRouteRequest — запрос на создание маршрута
@@ -36,7 +36,7 @@ type UpdateRouteRequest struct {
 func (r *Route) ComputeStatus() string {
 	now := time.Now()
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	
+
 	if r.StartDate.After(today) {
 		return "будет"
 	}
