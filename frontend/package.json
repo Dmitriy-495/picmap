@@ -1,0 +1,26 @@
+{
+  "name": "picmap-frontend",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/icon": "^2.5.1",
+    "@nuxt/ui": "^4.11.3",
+    "leaflet": "^1.9.4",
+    "nuxt": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22"
+  },
+  "pnpm": {
+    "overrides": {
+      "glob": "^13.0.0"
+    }
+  }
+}

@@ -31,6 +31,7 @@ func main() {
 	log.Println("✅ Connected to PostgreSQL")
 
 	r := gin.Default()
+	r.Use(handlers.CORSMiddleware())
 
 	// Static для загрузок
 	uploadDir := os.Getenv("UPLOAD_DIR")
