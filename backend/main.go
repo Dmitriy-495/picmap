@@ -61,6 +61,7 @@ func main() {
 		// Публичные
 		api.POST("/auth/login", authHandler.Login)
 		api.GET("/routes", routesHandler.List)
+		api.GET("/routes/:id", routesHandler.Get)
 		api.GET("/routes/:id/places", placesHandler.List)
 		api.GET("/routes/:id/comments", commentsHandler.List)
 		api.GET("/routes/:id/photos", photosHandler.ListByRoute)
@@ -71,7 +72,6 @@ func main() {
 		protected.Use(handlers.JWTMiddleware())
 		{
 			protected.GET("/auth/me", authHandler.Me)
-			protected.GET("/routes/:id", routesHandler.Get)
 			protected.POST("/routes", routesHandler.Create)
 			protected.DELETE("/routes/:id", routesHandler.Delete)
 			protected.POST("/routes/:id/places", placesHandler.Create)

@@ -1,13 +1,15 @@
-
 export default defineNuxtConfig({
-  compatibilityDate: "2026-10-06",
+  compatibilityDate: '2026-10-06',
   ssr: false,
 
-  modules: ["@nuxt/ui", "@nuxt/icon"],
+  modules: ['@nuxt/ui', '@nuxt/icon'],
 
-  css: ["~/assets/css/main.css", "leaflet/dist/leaflet.css"],
+  components: [
+    { path: '~/components', pathPrefix: false },
+  ],
 
-  // Отключаем загрузку шрифтов
+  css: ['~/assets/css/main.css', 'leaflet/dist/leaflet.css'],
+
   fonts: {
     providers: {
       google: false,
@@ -19,29 +21,29 @@ export default defineNuxtConfig({
   },
 
   colorMode: {
-    preference: "dark",
-    fallback: "dark",
+    preference: 'dark',
+    fallback: 'dark',
   },
 
   runtimeConfig: {
     public: {
-      apiBase: "http://picmap.ru",
+      apiBase: 'http://picmap.ru',
     },
   },
 
   app: {
     head: {
-      htmlAttrs: { lang: "ru" },
-      title: "PicMap",
+      htmlAttrs: { lang: 'ru' },
+      title: 'PicMap',
       meta: [
         {
-          name: "description",
-          content: "Твои путешествия. Твои воспоминания.",
+          name: 'description',
+          content: 'Твои путешествия. Твои воспоминания.',
         },
-        { name: "viewport", content: "width=device-width, initial-scale=1.0" },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1.0' },
       ],
     },
   },
 
   devtools: { enabled: true },
-});
+})
