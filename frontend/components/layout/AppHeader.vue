@@ -1,9 +1,13 @@
 <template>
-  <header class="sticky top-0 z-50 backdrop-blur-xl bg-[#020420]/80 border-b border-white/10">
+  <header
+    class="sticky top-0 z-50 backdrop-blur-xl bg-[#020420]/80 border-b border-white/10"
+  >
     <AppContainer>
       <div class="flex items-center justify-between h-20">
         <NuxtLink to="/" class="flex items-center gap-3 group">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00dc82] to-[#00b86b] flex items-center justify-center shadow-lg shadow-[#00dc82]/20 group-hover:shadow-[#00dc82]/40 transition-shadow">
+          <div
+            class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#00dc82] to-[#00b86b] flex items-center justify-center shadow-lg shadow-[#00dc82]/20 group-hover:shadow-[#00dc82]/40 transition-shadow"
+          >
             <span class="text-[#020420] text-xl font-bold">🌍</span>
           </div>
           <span class="text-2xl font-bold">PicMap</span>
@@ -74,12 +78,13 @@
 </template>
 
 <script setup lang="ts">
-const { isAuthenticated, isSuperuser, isOwner, user, logout } = useAuth()
+const { isAuthenticated, isSuperuser, isOwner, user, logout } = useAuth();
 
-const showInviteModal = ref(false)
+const showInviteModal = ref(false);
 
 const handleLogout = () => {
-  logout()
-  navigateTo('/login')
-}
+  showInviteModal.value = false;
+  logout();
+  navigateTo("/login");
+};
 </script>
