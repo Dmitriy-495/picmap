@@ -45,7 +45,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "picmap-backend",
-			"version": "0.7.0",
+			"version": "0.8.0",
 		})
 	})
 
@@ -57,6 +57,7 @@ func main() {
 	photosHandler := handlers.NewPhotosHandler(pool)
 	invitationsHandler := handlers.NewInvitationsHandler(pool)
 	registerHandler := handlers.NewRegisterHandler(pool)
+	adminHandler := handlers.NewAdminHandler(pool)
 
 	api := r.Group("/api")
 	{
@@ -95,6 +96,7 @@ func main() {
 			protected.POST("/admin/invitations", invitationsHandler.Create)
 			protected.GET("/admin/invitations", invitationsHandler.List)
 			protected.DELETE("/admin/invitations/:id", invitationsHandler.Delete)
+			protected.GET("/admin/users", adminHandler.ListUsers)
 		}
 	}
 
