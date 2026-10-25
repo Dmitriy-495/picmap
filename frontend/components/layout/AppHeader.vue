@@ -9,7 +9,7 @@
           <span class="text-2xl font-bold">PicMap</span>
         </NuxtLink>
 
-        <nav class="flex items-center gap-8">
+        <nav class="flex items-center gap-6">
           <NuxtLink
             to="/"
             class="text-sm text-gray-400 hover:text-white transition-colors"
@@ -25,6 +25,26 @@
             >
               + Создать
             </NuxtLink>
+
+            <!-- Админка (для superuser) -->
+            <NuxtLink
+              v-if="isSuperuser"
+              to="/administrator"
+              class="text-sm text-gray-400 hover:text-white transition-colors"
+              active-class="text-white"
+            >
+              ⚙️ Администратор
+            </NuxtLink>
+
+            <!-- Пригласить (для owner) -->
+            <button
+              v-if="isOwner"
+              @click="showInviteModal = true"
+              class="text-sm text-[#00dc82] hover:text-[#00c070] transition-colors"
+            >
+              🎟️ Пригласить
+            </button>
+
             <div class="flex items-center gap-3 pl-6 border-l border-white/10">
               <span class="text-sm text-gray-400">{{ user?.username }}</span>
               <button
@@ -47,11 +67,16 @@
         </nav>
       </div>
     </AppContainer>
+
+    <!-- Модалка приглашения -->
+    <InviteModal v-model="showInviteModal" />
   </header>
 </template>
 
 <script setup lang="ts">
-const { isAuthenticated, user, logout } = useAuth()
+const { isAuthenticated, isSuperuser, isOwner, user, logout } = useAuth()
+
+const showInviteModal = ref(false)
 
 const handleLogout = () => {
   logout()
