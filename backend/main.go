@@ -45,7 +45,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "ok",
 			"service": "picmap-backend",
-			"version": "0.6.0",
+			"version": "0.7.0",
 		})
 	})
 
@@ -55,11 +55,16 @@ func main() {
 	placesHandler := handlers.NewPlacesHandler(pool)
 	commentsHandler := handlers.NewCommentsHandler(pool)
 	photosHandler := handlers.NewPhotosHandler(pool)
+	invitationsHandler := handlers.NewInvitationsHandler(pool)
+	registerHandler := handlers.NewRegisterHandler(pool)
 
 	api := r.Group("/api")
 	{
 		// Публичные
 		api.POST("/auth/login", authHandler.Login)
+		api.POST("/auth/register", registerHandler.Register)
+		api.GET("/invitations/:token", invitationsHandler.GetByToken)
+
 		api.GET("/routes", routesHandler.List)
 		api.GET("/routes/:id", routesHandler.Get)
 		api.GET("/routes/:id/places", placesHandler.List)
@@ -72,15 +77,24 @@ func main() {
 		protected.Use(handlers.JWTMiddleware())
 		{
 			protected.GET("/auth/me", authHandler.Me)
+
 			protected.POST("/routes", routesHandler.Create)
 			protected.DELETE("/routes/:id", routesHandler.Delete)
+
 			protected.POST("/routes/:id/places", placesHandler.Create)
 			protected.DELETE("/places/:id", placesHandler.Delete)
+
 			protected.POST("/routes/:id/comments", commentsHandler.Create)
 			protected.PUT("/comments/:id", commentsHandler.Update)
 			protected.DELETE("/comments/:id", commentsHandler.Delete)
+
 			protected.POST("/photos/upload", photosHandler.Upload)
 			protected.DELETE("/photos/:id", photosHandler.Delete)
+
+			// Админка (только owner — проверка внутри handler)
+			protected.POST("/admin/invitations", invitationsHandler.Create)
+			protected.GET("/admin/invitations", invitationsHandler.List)
+			protected.DELETE("/admin/invitations/:id", invitationsHandler.Delete)
 		}
 	}
 

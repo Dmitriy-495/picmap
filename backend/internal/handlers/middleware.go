@@ -19,7 +19,6 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Ожидаем "Bearer <token>"
 		parts := strings.SplitN(header, " ", 2)
 		if len(parts) != 2 || parts[0] != "Bearer" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid authorization header"})
@@ -34,11 +33,11 @@ func JWTMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Кладём данные в контекст
 		c.Set("user_id", claims.UserID)
 		c.Set("is_superuser", claims.IsSuperuser)
 		c.Set("is_admin", claims.IsAdmin)
 		c.Set("is_guide", claims.IsGuide)
+		c.Set("is_owner", claims.IsOwner)
 
 		c.Next()
 	}

@@ -11,6 +11,8 @@ type User struct {
 	IsSuperuser  bool      `json:"is_superuser"`
 	IsAdmin      bool      `json:"is_admin"`
 	IsGuide      bool      `json:"is_guide"`
+	IsOwner      bool      `json:"is_owner"`
+	IsBlocked    bool      `json:"is_blocked"`
 	CreatedAt    time.Time `json:"created_at"`
 }
 

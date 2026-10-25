@@ -8,17 +8,22 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// Claims — полезная нагрузка JWT
 type Claims struct {
 	UserID      int64 `json:"user_id"`
 	IsSuperuser bool  `json:"is_superuser"`
 	IsAdmin     bool  `json:"is_admin"`
 	IsGuide     bool  `json:"is_guide"`
+	IsOwner     bool  `json:"is_owner"`
 	jwt.RegisteredClaims
 }
 
-// GenerateToken создаёт JWT для пользователя
+// GenerateToken создаёт JWT
 func GenerateToken(userID int64, isSuperuser, isAdmin, isGuide bool) (string, error) {
+	return GenerateTokenWithOwner(userID, isSuperuser, isAdmin, isGuide, false)
+}
+
+// GenerateTokenWithOwner — с is_owner
+func GenerateTokenWithOwner(userID int64, isSuperuser, isAdmin, isGuide, isOwner bool) (string, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		return "", errors.New("JWT_SECRET not set")
@@ -29,8 +34,9 @@ func GenerateToken(userID int64, isSuperuser, isAdmin, isGuide bool) (string, er
 		IsSuperuser: isSuperuser,
 		IsAdmin:     isAdmin,
 		IsGuide:     isGuide,
+		IsOwner:     isOwner,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)), // 7 дней
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			Issuer:    "picmap",
 		},
@@ -40,7 +46,7 @@ func GenerateToken(userID int64, isSuperuser, isAdmin, isGuide bool) (string, er
 	return token.SignedString([]byte(secret))
 }
 
-// ValidateToken проверяет JWT и возвращает Claims
+// ValidateToken проверяет JWT
 func ValidateToken(tokenString string) (*Claims, error) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
