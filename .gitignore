@@ -40,3 +40,4 @@ picmap-nginx.conf
 postgres-info.txt
 *.key
 *.pem
+backend/config.json
