@@ -22,7 +22,6 @@ func NewInvitationsHandler(db *pgxpool.Pool) *InvitationsHandler {
 	return &InvitationsHandler{DB: db}
 }
 
-// generateToken — случайный 32-байтный токен (64 hex-символа)
 func generateToken() (string, error) {
 	bytes := make([]byte, 32)
 	if _, err := rand.Read(bytes); err != nil {
@@ -31,8 +30,7 @@ func generateToken() (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-// Create — POST /api/admin/invitations
-// Доступ: только owner
+// Create — POST /api/admin/invitations (owner only)
 func (h *InvitationsHandler) Create(c *gin.Context) {
 	userID := c.GetInt64("user_id")
 	isOwner := c.GetBool("is_owner")
@@ -54,17 +52,16 @@ func (h *InvitationsHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// Срок действия: 7 дней
 	expiresAt := time.Now().Add(7 * 24 * time.Hour)
 
 	var inv models.Invitation
 	err = h.DB.QueryRow(context.Background(),
-		`INSERT INTO invitations (token, created_by, expires_at)
-		 VALUES ($1, $2, $3)
-		 RETURNING id, token, created_by, used_by, expires_at, used_at, created_at`,
-		token, userID, expiresAt,
+		`INSERT INTO invitations (token, email, created_by, expires_at)
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING id, token, email, created_by, used_by, expires_at, used_at, created_at`,
+		token, req.Email, userID, expiresAt,
 	).Scan(
-		&inv.ID, &inv.Token, &inv.CreatedBy, &inv.UsedBy,
+		&inv.ID, &inv.Token, &inv.Email, &inv.CreatedBy, &inv.UsedBy,
 		&inv.ExpiresAt, &inv.UsedAt, &inv.CreatedAt,
 	)
 
@@ -73,7 +70,6 @@ func (h *InvitationsHandler) Create(c *gin.Context) {
 		return
 	}
 
-	// Формируем ссылку
 	frontendURL := os.Getenv("FRONTEND_URL")
 	if frontendURL == "" {
 		frontendURL = "http://localhost:3000"
@@ -85,8 +81,7 @@ func (h *InvitationsHandler) Create(c *gin.Context) {
 	})
 }
 
-// List — GET /api/admin/invitations
-// Доступ: только owner
+// List — GET /api/admin/invitations (owner only)
 func (h *InvitationsHandler) List(c *gin.Context) {
 	isOwner := c.GetBool("is_owner")
 
@@ -96,7 +91,7 @@ func (h *InvitationsHandler) List(c *gin.Context) {
 	}
 
 	rows, err := h.DB.Query(context.Background(),
-		`SELECT id, token, created_by, used_by, expires_at, used_at, created_at
+		`SELECT id, token, COALESCE(email, ''), created_by, used_by, expires_at, used_at, created_at
 		 FROM invitations
 		 ORDER BY created_at DESC`)
 	if err != nil {
@@ -108,7 +103,7 @@ func (h *InvitationsHandler) List(c *gin.Context) {
 	invitations := []models.Invitation{}
 	for rows.Next() {
 		var inv models.Invitation
-		rows.Scan(&inv.ID, &inv.Token, &inv.CreatedBy, &inv.UsedBy,
+		rows.Scan(&inv.ID, &inv.Token, &inv.Email, &inv.CreatedBy, &inv.UsedBy,
 			&inv.ExpiresAt, &inv.UsedAt, &inv.CreatedAt)
 		invitations = append(invitations, inv)
 	}
@@ -116,8 +111,7 @@ func (h *InvitationsHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, invitations)
 }
 
-// Delete — DELETE /api/admin/invitations/:id
-// Доступ: только owner
+// Delete — DELETE /api/admin/invitations/:id (owner only)
 func (h *InvitationsHandler) Delete(c *gin.Context) {
 	isOwner := c.GetBool("is_owner")
 
@@ -138,16 +132,15 @@ func (h *InvitationsHandler) Delete(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "invitation deleted"})
 }
 
-// GetByToken — GET /api/invitations/:token (публичный)
-// Проверяет, действителен ли токен
+// GetByToken — GET /api/invitations/:token (public)
 func (h *InvitationsHandler) GetByToken(c *gin.Context) {
 	token := c.Param("token")
 
 	var inv models.Invitation
 	err := h.DB.QueryRow(context.Background(),
-		`SELECT id, token, created_by, used_by, expires_at, used_at, created_at
+		`SELECT id, token, COALESCE(email, ''), created_by, used_by, expires_at, used_at, created_at
 		 FROM invitations WHERE token = $1`, token,
-	).Scan(&inv.ID, &inv.Token, &inv.CreatedBy, &inv.UsedBy,
+	).Scan(&inv.ID, &inv.Token, &inv.Email, &inv.CreatedBy, &inv.UsedBy,
 		&inv.ExpiresAt, &inv.UsedAt, &inv.CreatedAt)
 
 	if err != nil {
@@ -155,7 +148,6 @@ func (h *InvitationsHandler) GetByToken(c *gin.Context) {
 		return
 	}
 
-	// Проверяем: не использовано и не истекло
 	if inv.UsedAt != nil {
 		c.JSON(http.StatusGone, gin.H{"error": "invitation already used"})
 		return

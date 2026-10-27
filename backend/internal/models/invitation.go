@@ -6,6 +6,7 @@ import "time"
 type Invitation struct {
 	ID        int64      `json:"id"`
 	Token     string     `json:"token"`
+	Email     string     `json:"email"`
 	CreatedBy int64      `json:"created_by"`
 	UsedBy    *int64     `json:"used_by,omitempty"`
 	ExpiresAt time.Time  `json:"expires_at"`
@@ -13,12 +14,12 @@ type Invitation struct {
 	CreatedAt time.Time  `json:"created_at"`
 }
 
-// CreateInvitationRequest — запрос на создание приглашения
+// CreateInvitationRequest — запрос на создание
 type CreateInvitationRequest struct {
 	Email string `json:"email" binding:"required,email"`
 }
 
-// CreateInvitationResponse — ответ с готовой ссылкой
+// CreateInvitationResponse — ответ
 type CreateInvitationResponse struct {
 	Invitation Invitation `json:"invitation"`
 	URL        string     `json:"url"`

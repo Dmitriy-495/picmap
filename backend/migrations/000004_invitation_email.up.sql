@@ -1,0 +1,1 @@
+ALTER TABLE invitations ADD COLUMN email VARCHAR(255);

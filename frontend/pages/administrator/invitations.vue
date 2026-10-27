@@ -70,6 +70,7 @@
       <table class="w-full">
         <thead class="bg-white/5 border-b border-white/10">
           <tr>
+            <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">Email</th>
             <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">Токен</th>
             <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">Создано</th>
             <th class="text-left px-6 py-4 text-sm font-semibold text-gray-400">Истекает</th>
@@ -79,7 +80,8 @@
         </thead>
         <tbody>
           <tr v-for="inv in invitations" :key="inv.id" class="border-b border-white/5 last:border-0">
-            <td class="px-6 py-4 text-sm font-mono text-gray-300">{{ inv.token.slice(0, 16) }}...</td>
+            <td class="px-6 py-4 text-sm text-gray-300">{{ inv.email || '—' }}</td>
+            <td class="px-6 py-4 text-sm font-mono text-gray-400">{{ inv.token.slice(0, 16) }}...</td>
             <td class="px-6 py-4 text-sm text-gray-400">{{ formatDate(inv.created_at) }}</td>
             <td class="px-6 py-4 text-sm text-gray-400">{{ formatDate(inv.expires_at) }}</td>
             <td class="px-6 py-4">
@@ -170,7 +172,7 @@ const copyUrl = async () => {
 }
 
 const copyInviteUrl = async (token: string) => {
-  const url = window.location.origin.replace('localhost:3000', 'localhost:3000') + '/invite/' + token
+  const url = window.location.origin.replace('localhost:3000', 'picmap.ru') + '/invite/' + token
   try {
     await navigator.clipboard.writeText(url)
     alert('✅ Ссылка скопирована!')
