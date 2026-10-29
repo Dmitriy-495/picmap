@@ -115,7 +115,7 @@ echo ""
 # 5. HEALTH CHECK
 # ══════════════════════════════════════
 echo -e "${YELLOW}⏳ Waiting...${NC}"
-sleep 3
+sleep 5
 echo ""
 
 echo -e "${YELLOW}✅ Checking backend...${NC}"
@@ -128,10 +128,22 @@ fi
 echo ""
 
 echo -e "${YELLOW}✅ Checking frontend...${NC}"
-if curl -sf http://picmap.ru/ > /dev/null; then
+RETRIES=5
+FRONTEND_OK=false
+
+for i in $(seq 1 $RETRIES); do
+    if curl -sf http://picmap.ru/ > /dev/null; then
+        FRONTEND_OK=true
+        break
+    fi
+    echo -e "${YELLOW}  Попытка $i/$RETRIES...${NC}"
+    sleep 3
+done
+
+if [ "$FRONTEND_OK" = true ]; then
     echo -e "${GREEN}✅ Frontend OK${NC}"
 else
-    echo -e "${RED}❌ Frontend failed${NC}"
+    echo -e "${RED}❌ Frontend failed (после $RETRIES попыток)${NC}"
     ssh pm "sudo journalctl -u picmap-frontend -n 30 --no-pager"
     exit 1
 fi
